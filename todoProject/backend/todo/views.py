@@ -5,5 +5,5 @@ from .serializers import TodoSerializer
 # Create your views here.
 
 class TodoViewSet(viewsets.ModelViewSet):
-    queryset=Todo.objects.all()
+    queryset=Todo.objects.all().order_by("-id")
     serializer_class = TodoSerializer
