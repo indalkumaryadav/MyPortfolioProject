@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -8,28 +8,31 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
-  getTodo() async{
-    var response = await Dio().get('http://192.168.43.118:8000/todos/');
-    print(response);
-  }
-
-
   @override
   void initState() { 
     super.initState();
-    print(getTodo());
+    
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text("Todo App"),
+    return MultiProvider(
+      providers: [
+       
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          appBar: AppBar(
+            title: Text("Todo"),
+          ),
+          body: ,
+          floatingActionButton: FloatingActionButton(
+            onPressed: (){},
+            child: Icon(Icons.add),
+          ),
         ),
-        body: Text("Indal"),
       ),
     );
-
   }
 }
