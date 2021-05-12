@@ -1,39 +1,47 @@
 import 'dart:async';
-import 'package:todo_app/bloc/counter_event.dart';
 
-class CounterBloc{
-  int _counter=0;
+import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
 
-  final _stateStreamController=StreamController<int>();
-  StreamSink<int> get _counterSink=> _stateStreamController.sink;
-  Stream<int> get conterStream => _stateStreamController.stream;
+import '../data/models/todo.dart';
+import '../data/repositories/todo.dart';
 
+part 'todo_event.dart';
+part 'todo_state.dart';
 
-  final _eventStreamController = StreamController<CounterEvent>();
-  StreamSink<CounterEvent> get eventSink=> _eventStreamController.sink;
-  Stream<CounterEvent> get _eventStream => _eventStreamController.stream;
+class TodoBloc extends Bloc<TodoEvent, TodoState> {
+  final TodoRepository todoRepository;
 
+  TodoBloc({@required this.todoRepository}) : super(TodoLoadInProgress());
 
-  CounterBloc(){
-    _eventStreamController.stream.listen(_mapEventToState);
-  }
+  @override
+  Stream<TodoState> mapEventToState(
+    TodoEvent event,
+  ) async* {
 
-  void _mapEventToState(CounterEvent event){
-
-    if(event is Increment){
-      _counter++;
+     if (event is FetchTodoEvent) {
+      yield* _mapTodosLoadedToState();
     }
-    else if(event is Decrement){
-      _counter--;
+    else if(event is AddTodoEvent){
+      todoRepository.addTodo(event.todo);
+      yield* _mapTodosLoadedToState(); 
     }
-    _counterSink.add(_counter);
 
+    else if(event is DeleteTodoEvent){
+      todoRepository.deleteTodo(event.id);
+      yield* _mapTodosLoadedToState(); 
+    }
+    else if(event is UpdateTodoEvent){
+      todoRepository.updateTodo(event.title,event.id);
+      yield* _mapTodosLoadedToState(); 
+    } 
   }
 
-  void dispose(){
-    _stateStreamController.close();
-    _eventStreamController.close();
+  Stream<TodoState> _mapTodosLoadedToState() async* {
+      final todos = await this.todoRepository.fetchTodos();
+      yield TodoLoadSuccess(todos: todos);
   }
 
-
+ 
 }
